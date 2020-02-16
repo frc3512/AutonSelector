@@ -1,0 +1,21 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  \.ico$
+}
+
+modifiableFileExclude {
+  win32_socketpair
+}
+
+includeOtherLibs {
+  ^jpeglib\.h$
+}

@@ -1,0 +1,17 @@
+*.csv
+*.d
+*.dll
+*.exe
+*.o
+*.swp
+build/
+AutonSelectorTest
+AutonSelector-*
+
+# Qt-generated files
+.qmake.stash
+moc_*
+ui_*
+qrc_*
+Makefile*
+*.pro.user

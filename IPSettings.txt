@@ -1,0 +1,6 @@
+# The DS binds to this
+dsDataPort = 5800
+
+# The DS sends to this
+robotIP       = 10.35.12.2
+robotDataPort = 5800
