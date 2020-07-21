@@ -27,12 +27,12 @@ int main() {
     frc3512::AutonSelector autonSelector(5800);
     Robot robot;
 
-    autonSelector.AddAutoMethod("Auto 1", std::bind(&Robot::initFunc1, &robot),
-                                std::bind(&Robot::periodicFunc1, &robot));
-    autonSelector.AddAutoMethod("Auto 2", std::bind(&Robot::initFunc2, &robot),
-                                std::bind(&Robot::periodicFunc2, &robot));
-    autonSelector.AddAutoMethod("Auto 3", std::bind(&Robot::initFunc3, &robot),
-                                std::bind(&Robot::periodicFunc3, &robot));
+    autonSelector.AddMethod("Auto 1", std::bind(&Robot::initFunc1, &robot),
+                            std::bind(&Robot::periodicFunc1, &robot));
+    autonSelector.AddMethod("Auto 2", std::bind(&Robot::initFunc2, &robot),
+                            std::bind(&Robot::periodicFunc2, &robot));
+    autonSelector.AddMethod("Auto 3", std::bind(&Robot::initFunc3, &robot),
+                            std::bind(&Robot::periodicFunc3, &robot));
 
     while (1) {
         std::this_thread::sleep_for(100ms);

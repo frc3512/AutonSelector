@@ -48,17 +48,13 @@ AutonSelector::~AutonSelector() {
     m_recvThread.join();
 }
 
-void AutonSelector::AddAutoMethod(std::string_view methodName,
-                                  std::function<void()> initFunc,
-                                  std::function<void()> periodicFunc) {
+void AutonSelector::AddMethod(std::string_view methodName,
+                              std::function<void()> initFunc,
+                              std::function<void()> periodicFunc) {
     m_autonModes.emplace_back(methodName, initFunc, periodicFunc);
 }
 
 void AutonSelector::DeleteAllMethods() { m_autonModes.clear(); }
-
-std::string AutonSelector::GetAutonomousMode() const {
-    return std::get<0>(m_autonModes[m_curAutonMode]);
-}
 
 void AutonSelector::ExecAutonomousInit() {
     // Retrieves correct autonomous routine and runs it
@@ -69,6 +65,8 @@ void AutonSelector::ExecAutonomousPeriodic() {
     // Retrieves correct autonomous routine and runs it
     std::get<2>(m_autonModes[m_curAutonMode])();
 }
+
+void AutonSelector::SelectMethod(int index) { m_curAutonMode = index; }
 
 void AutonSelector::SendToDS(Packet& packet) {
     // No locking needed here because this function is only used by

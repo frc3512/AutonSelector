@@ -41,19 +41,13 @@ public:
     /**
      * Add an autonomous function.
      */
-    void AddAutoMethod(std::string_view methodName,
-                       std::function<void()> initFunc,
-                       std::function<void()> periodicFunc);
+    void AddMethod(std::string_view methodName, std::function<void()> initFunc,
+                   std::function<void()> periodicFunc);
 
     /**
      * Remove all autonomous functions.
      */
     void DeleteAllMethods();
-
-    /**
-     * Returns the name of the currently selected autonomous function.
-     */
-    std::string GetAutonomousMode() const;
 
     /**
      * Runs autonomous init function currently selected.
@@ -64,6 +58,17 @@ public:
      * Runs autonomous periodic function currently selected.
      */
     void ExecAutonomousPeriodic();
+
+    /**
+     * Override currently selected autonomous mode.
+     *
+     * This is used for unit testing.
+     *
+     * @param index The zero-based index of the autonomous mode. The indices are
+     *              assigned to autonomous modes in the order they were added
+     *              via AddMethod().
+     */
+    void SelectMethod(int index);
 
 private:
     using steady_clock = std::chrono::steady_clock;
