@@ -4,7 +4,7 @@
 #include <iostream>
 #include <thread>
 
-#include "AutonSelector/AutonSelector.hpp"
+#include "autonselector/AutonSelector.hpp"
 
 using namespace std::chrono_literals;
 
@@ -24,15 +24,15 @@ public:
 };
 
 int main() {
-    AutonSelector dsDisplay(5800);
+    frc3512::AutonSelector autonSelector(5800);
     Robot robot;
 
-    dsDisplay.AddAutoMethod("Auto 1", std::bind(&Robot::initFunc1, &robot),
-                            std::bind(&Robot::periodicFunc1, &robot));
-    dsDisplay.AddAutoMethod("Auto 2", std::bind(&Robot::initFunc2, &robot),
-                            std::bind(&Robot::periodicFunc2, &robot));
-    dsDisplay.AddAutoMethod("Auto 3", std::bind(&Robot::initFunc3, &robot),
-                            std::bind(&Robot::periodicFunc3, &robot));
+    autonSelector.AddAutoMethod("Auto 1", std::bind(&Robot::initFunc1, &robot),
+                                std::bind(&Robot::periodicFunc1, &robot));
+    autonSelector.AddAutoMethod("Auto 2", std::bind(&Robot::initFunc2, &robot),
+                                std::bind(&Robot::periodicFunc2, &robot));
+    autonSelector.AddAutoMethod("Auto 3", std::bind(&Robot::initFunc3, &robot),
+                                std::bind(&Robot::periodicFunc3, &robot));
 
     while (1) {
         std::this_thread::sleep_for(100ms);

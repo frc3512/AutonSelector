@@ -1,12 +1,12 @@
 // Copyright (c) 2016-2020 FRC Team 3512. All Rights Reserved.
 
-#include "AutonSelector/AutonSelector.hpp"
+#include "autonselector/AutonSelector.hpp"
 
-#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <memory>
 
+using namespace frc3512;
 using namespace std::chrono_literals;
 
 AutonSelector::AutonSelector(int port) : m_dsPort(port) {
@@ -84,7 +84,7 @@ void AutonSelector::ReceiveFromDS() {
     auto time = steady_clock::now();
     if (time - m_prevTime > 250ms) {
         Packet packet;
-        packet << static_cast<std::string>("\r\n");
+        packet << std::string{"\r\n"};
         SendToDS(packet);
 
         m_prevTime = time;
@@ -92,19 +92,20 @@ void AutonSelector::ReceiveFromDS() {
 
     if (m_socket.receive(m_recvBuffer, 256, m_recvAmount, m_recvIP,
                          m_recvPort) == UdpSocket::Done) {
-        if (std::strncmp(m_recvBuffer, "connect\r\n", 9) == 0) {
+        std::string_view recvStr{m_recvBuffer, m_recvAmount};
+        if (recvStr.substr(0, 9) == "connect\r\n") {
             {
-                std::lock_guard<std::mutex> lock(m_ipMutex);
+                std::scoped_lock lock(m_ipMutex);
                 m_dsIP = m_recvIP;
                 m_dsPort = m_recvPort;
             }
 
             // Send a list of available autonomous modes
             Packet packet;
-            packet << static_cast<std::string>("autonList\r\n");
+            packet << std::string{"autonList\r\n"};
 
-            for (unsigned int i = 0; i < m_autonModes.size(); i++) {
-                packet << std::get<0>(m_autonModes[i]);
+            for (const auto& autonMode : m_autonModes) {
+                packet << std::get<0>(autonMode);
             }
 
             SendToDS(packet);
@@ -112,17 +113,21 @@ void AutonSelector::ReceiveFromDS() {
             // Make sure driver knows which autonomous mode is selected
             packet.clear();
 
-            packet << static_cast<std::string>("autonConfirmed\r\n");
-            packet << std::get<0>(m_autonModes[m_curAutonMode]);
+            packet << std::string{"autonConfirmed\r\n"};
+            if (m_autonModes.size() > 0) {
+                packet << std::get<0>(m_autonModes[m_curAutonMode]);
+            } else {
+                packet << std::string{"N/A"};
+            }
 
             SendToDS(packet);
-        } else if (std::strncmp(m_recvBuffer, "autonSelect\r\n", 13) == 0) {
+        } else if (recvStr.substr(0, 13) == "autonSelect\r\n") {
             // Next byte after command is selection choice
             m_curAutonMode = m_recvBuffer[13];
 
             Packet packet;
 
-            packet << static_cast<std::string>("autonConfirmed\r\n");
+            packet << std::string{"autonConfirmed\r\n"};
             packet << std::get<0>(m_autonModes[m_curAutonMode]);
 
             // Store newest autonomous choice to file for persistent storage

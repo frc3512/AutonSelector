@@ -14,9 +14,10 @@
 #include <tuple>
 #include <vector>
 
-#include "AutonSelector/Packet.hpp"
-#include "AutonSelector/UdpSocket.hpp"
+#include "autonselector/Packet.hpp"
+#include "autonselector/UdpSocket.hpp"
 
+namespace frc3512 {
 /**
  * This class allows you to pack data into an SFML packet and send it to an
  * application on the DriverStation that displays it in a GUI.
@@ -28,6 +29,7 @@
  * 3) After all data is packed, call SendToDS() to send the data to the Driver
  *    Station.
  */
+
 class AutonSelector {
 public:
     explicit AutonSelector(int port);
@@ -104,3 +106,4 @@ private:
      */
     void ReceiveFromDS();
 };
+}  // namespace frc3512

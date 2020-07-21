@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 FRC Team 3512. All Rights Reserved.
+// Copyright (c) 2020 FRC Team 3512. All Rights Reserved.
 
 #pragma once
 
@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <stdint.h>
 #include <unistd.h>
+
+namespace frc3512 {
 
 class Packet;
 
@@ -158,3 +160,5 @@ private:
     // Returns status corresponding to the last socket error
     static Status getErrorStatus();
 };
+
+}  // namespace frc3512

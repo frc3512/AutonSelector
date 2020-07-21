@@ -1,6 +1,6 @@
-// Copyright (c) 2017-2020 FRC Team 3512. All Rights Reserved.
+// Copyright (c) 2020 FRC Team 3512. All Rights Reserved.
 
-#include "AutonSelector/UdpSocket.hpp"
+#include "autonselector/UdpSocket.hpp"
 
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -8,7 +8,9 @@
 #include <cstring>
 #include <iostream>
 
-#include "AutonSelector/Packet.hpp"
+#include "autonselector/Packet.hpp"
+
+using namespace frc3512;
 
 UdpSocket::~UdpSocket() { close(); }
 

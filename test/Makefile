@@ -9,7 +9,7 @@ CXXFLAGS := -O0 -g3 -Wall -std=c++17
 LD := g++
 
 # Specify Linux include paths with -I directives here
-IFLAGS := -Ihost
+IFLAGS := -Ihost/include
 
 # Specify Linux libs with -l directives here
 LDFLAGS := -pthread
@@ -21,10 +21,10 @@ EXEC := $(NAME)
 rwildcard=$(wildcard $1$2) $(foreach dir,$(wildcard $1*),$(call rwildcard,$(dir)/,$2))
 
 # Recursively find all C source files
-SRC_C := $(call rwildcard,src/,*.c) $(call rwildcard,host/,*.c)
+SRC_C := $(call rwildcard,src/,*.c) $(call rwildcard,host/cpp,*.c)
 
 # Recursively find all C++ source files
-SRC_CXX := $(call rwildcard,src/,*.cpp) $(call rwildcard,host/,*.cpp)
+SRC_CXX := $(call rwildcard,src/,*.cpp) $(call rwildcard,host/cpp,*.cpp)
 
 # Create raw list of object files
 C_OBJ := $(SRC_C:.c=.o)
