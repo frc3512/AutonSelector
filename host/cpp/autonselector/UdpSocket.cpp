@@ -14,6 +14,18 @@ using namespace frc3512;
 
 UdpSocket::~UdpSocket() { Close(); }
 
+UdpSocket::UdpSocket(UdpSocket&& rhs) {
+    m_socket = rhs.m_socket;
+    rhs.m_socket = -1;
+}
+
+UdpSocket& UdpSocket::operator=(UdpSocket&& rhs) {
+    Close();
+    m_socket = rhs.m_socket;
+    rhs.m_socket = -1;
+    return *this;
+}
+
 UdpSocket::Status UdpSocket::Bind(uint16_t port) {
     // Create the internal socket if it doesn't exist
     Create();

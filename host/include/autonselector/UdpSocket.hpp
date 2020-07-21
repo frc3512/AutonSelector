@@ -32,8 +32,8 @@ public:
     UdpSocket() = default;
     ~UdpSocket();
 
-    UdpSocket(const UdpSocket&) = delete;
-    UdpSocket& operator=(const UdpSocket&) = delete;
+    UdpSocket(UdpSocket&& rhs);
+    UdpSocket& operator=(UdpSocket&& rhs);
 
     /**
      * Bind the socket to a specific port
