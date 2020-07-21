@@ -19,17 +19,17 @@
 
 namespace frc3512 {
 /**
- * This class allows you to pack data into an SFML packet and send it to an
- * application on the DriverStation that displays it in a GUI.
+ * The Autonomous Selector is a program we wrote and a protocol we invented to
+ * facilitate running multiple autonomous modes, each being selectable from the
+ * Driver Station.
  *
  * USAGE:
  * 1) Instantiate AutonSelector with the port on which communications will be
  *    received (probably 1130).
- * 2) Call several variations of AddData().
- * 3) After all data is packed, call SendToDS() to send the data to the Driver
- *    Station.
+ * 2) Call AddMethod() with each available autonomous mode.
+ * 3) Call ExecAutonomousInit() and ExecAutonomousPeriodic() in the init and
+ *    periodic functions of the robot class.
  */
-
 class AutonSelector {
 public:
     explicit AutonSelector(int port);
@@ -39,23 +39,27 @@ public:
     AutonSelector& operator=(const AutonSelector&) = delete;
 
     /**
-     * Add an autonomous function.
+     * Adds an autonomous function pair to the selection list.
      */
     void AddMethod(std::string_view methodName, std::function<void()> initFunc,
                    std::function<void()> periodicFunc);
 
     /**
-     * Remove all autonomous functions.
+     * Empties the autonomous mode selection list.
      */
     void DeleteAllMethods();
 
     /**
-     * Runs autonomous init function currently selected.
+     * Runs the init function of the currently selected autonomous mode.
+     *
+     * Call this in TimedRobot::AutonomousInit().
      */
     void ExecAutonomousInit();
 
     /**
-     * Runs autonomous periodic function currently selected.
+     * Runs the periodic function of the currently selected autonomous mode.
+     *
+     * Call this in TimedRobot::AutonomousPeriodic().
      */
     void ExecAutonomousPeriodic();
 

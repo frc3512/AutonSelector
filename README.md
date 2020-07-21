@@ -34,11 +34,11 @@ To compile natively on windows:
 3. Run `publish-msys2win32.sh` to create a .zip of the application binary
    and necessary files
 
-## Robot Setup
+## Robot setup
 
 To use this program with a new robot, copy the AutonSelector folder in the [host folder](host) into the source tree and `#include AutonSelector.hpp`.
 
-## AutonSelector Client Setup
+## AutonSelector client setup
 
 Since this project was designed to link to libstdc++ and libgcc statically, AutonSelector.exe and IPSettings.txt are the only required files on the Driver Station.
 
@@ -70,31 +70,3 @@ Port to which to send connection packets and autonomous mode selections
     #the DS sends to this
     robotIP           = 10.35.12.2
     robotDataPort     = 1130
-
-## Usage
-
-### Autonomous Routines
-
-The AutonSelector supports selection of an autonomous mode without needing to rebuild code or reboot the roboRIO. To leverage this functionality, the appropriate autonomous functions must be made available to the AutonSelector.
-
-#### Interface
-
-##### `void AddAutoMethod(std::string_view methodName, std::function<void()> func)`
-
-Add the appropriate autonomous functions to the list available on the AutonSelector.
-
-##### `void DeleteAllMethods()`
-
-Erases the current list of autonomous functions stored.
-
-##### `void ExecAutonomousInit()`
-
-Executes the currently selected autonomous routine.
-
-* Call this in the AutonomousInit() function of the TimedRobot template
-
-##### `void ExecAutonomousPeriodic()`
-
-Executes the currently selected autonomous routine.
-
-* Call this in the AutonomousPeriodic() function of the TimedRobot template
