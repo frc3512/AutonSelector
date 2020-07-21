@@ -64,11 +64,9 @@ public:
      *
      * This is used for unit testing.
      *
-     * @param index The zero-based index of the autonomous mode. The indices are
-     *              assigned to autonomous modes in the order they were added
-     *              via AddMethod().
+     * @param name Name of autonomous mode.
      */
-    void SelectMethod(int index);
+    void SelectMethod(std::string_view name);
 
 private:
     using steady_clock = std::chrono::steady_clock;
@@ -95,7 +93,7 @@ private:
     std::vector<
         std::tuple<std::string, std::function<void()>, std::function<void()>>>
         m_autonModes;
-    char m_curAutonMode;
+    std::atomic<char> m_curAutonMode;
 
     std::thread m_recvThread;
     std::mutex m_ipMutex;

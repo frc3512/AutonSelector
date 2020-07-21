@@ -2,6 +2,7 @@
 
 #include "autonselector/AutonSelector.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -20,7 +21,9 @@ AutonSelector::AutonSelector(int port) : m_dsPort(port) {
     std::ifstream autonModeFile("autonMode.txt");
 #endif
     if (autonModeFile.is_open()) {
-        if (autonModeFile >> m_curAutonMode) {
+        char autonMode;
+        if (autonModeFile >> autonMode) {
+            m_curAutonMode = autonMode;
             std::cout << "AutonSelector: restored auton " << m_curAutonMode
                       << std::endl;
 
@@ -66,7 +69,14 @@ void AutonSelector::ExecAutonomousPeriodic() {
     std::get<2>(m_autonModes[m_curAutonMode])();
 }
 
-void AutonSelector::SelectMethod(int index) { m_curAutonMode = index; }
+void AutonSelector::SelectMethod(std::string_view name) {
+    auto it =
+        std::find_if(m_autonModes.begin(), m_autonModes.end(),
+                     [&](const auto& i) { return std::get<0>(i) == name; });
+    if (it != m_autonModes.cend()) {
+        m_curAutonMode = std::distance(m_autonModes.begin(), it);
+    }
+}
 
 void AutonSelector::SendToDS(Packet& packet) {
     // No locking needed here because this function is only used by
