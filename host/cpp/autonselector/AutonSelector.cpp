@@ -10,8 +10,8 @@ using namespace frc3512;
 using namespace std::chrono_literals;
 
 AutonSelector::AutonSelector(int port) : m_dsPort(port) {
-    m_socket.bind(port);
-    m_socket.setBlocking(false);
+    m_socket.Bind(port);
+    m_socket.SetBlocking(false);
 
     // Retrieve stored autonomous index
 #ifdef __FRC_ROBORIO__
@@ -75,7 +75,7 @@ void AutonSelector::SendToDS(Packet& packet) {
     // ReceiveFromDS(). Only other reads of m_dsIP and m_dsPort can occur at
     // this point.
     if (m_dsIP != 0) {
-        m_socket.send(packet, m_dsIP, m_dsPort);
+        m_socket.Send(packet, m_dsIP, m_dsPort);
     }
 }
 
@@ -90,7 +90,7 @@ void AutonSelector::ReceiveFromDS() {
         m_prevTime = time;
     }
 
-    if (m_socket.receive(m_recvBuffer, 256, m_recvAmount, m_recvIP,
+    if (m_socket.Receive(m_recvBuffer, 256, m_recvAmount, m_recvIP,
                          m_recvPort) == UdpSocket::Done) {
         std::string_view recvStr{m_recvBuffer, m_recvAmount};
         if (recvStr.substr(0, 9) == "connect\r\n") {
@@ -111,7 +111,7 @@ void AutonSelector::ReceiveFromDS() {
             SendToDS(packet);
 
             // Make sure driver knows which autonomous mode is selected
-            packet.clear();
+            packet.Clear();
 
             packet << std::string{"autonConfirmed\r\n"};
             if (m_autonModes.size() > 0) {
