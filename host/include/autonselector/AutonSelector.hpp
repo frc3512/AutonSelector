@@ -7,12 +7,13 @@
 #include <atomic>
 #include <chrono>
 #include <functional>
-#include <mutex>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <tuple>
 #include <vector>
+
+#include <wpi/mutex.h>
 
 #include "autonselector/Packet.hpp"
 #include "autonselector/UdpSocket.hpp"
@@ -39,38 +40,56 @@ public:
     AutonSelector& operator=(const AutonSelector&) = delete;
 
     /**
-     * Adds an autonomous function pair to the selection list.
-     */
-    void AddMethod(std::string_view methodName, std::function<void()> initFunc,
-                   std::function<void()> periodicFunc);
-
-    /**
-     * Empties the autonomous mode selection list.
-     */
-    void DeleteAllMethods();
-
-    /**
-     * Runs the init function of the currently selected autonomous mode.
+     * Adds an autonomous function.
      *
-     * Call this in TimedRobot::AutonomousInit().
+     * @param modeName Name of autonomous mode.
+     * @param initFunc Init() function for autonomous mode that will run in
+     *                 AutonomousInit().
+     * @param periodicFunc Periodic() function for autonomous mode that will run
+     *                     in AutonomousPeriodic().
+     */
+    void AddMode(std::string_view modeName, std::function<void()> initFunc,
+                 std::function<void()> periodicFunc);
+
+    /**
+     * Sets the selected autonomous mode.
+     *
+     * @param modeName Name of autonomous mode.
+     */
+    void SetMode(std::string_view modeName);
+
+    /**
+     * Sets the auton mode for the autonomous unit tests
+     *
+     * @param mode Numbered position of autonomous mode (numbers are assigned to
+     *             autonomous mode in the order they are added starting from
+     *             zero).
+     */
+    void SetMode(int mode);
+
+    /**
+     * Returns autonomous mode name for the given index.
+     *
+     * @param mode Numbered position of autonomous mode (numbers are assigned to
+     *             autonomous mode in the order they are added starting from
+     *             zero).
+     */
+    std::string_view GetName(int mode) const;
+
+    /**
+     * Returns number of registered autonomous modes.
+     */
+    int Size() const;
+
+    /**
+     * Runs autonomous init function currently selected.
      */
     void ExecAutonomousInit();
 
     /**
-     * Runs the periodic function of the currently selected autonomous mode.
-     *
-     * Call this in TimedRobot::AutonomousPeriodic().
+     * Runs autonomous periodic function currently selected.
      */
     void ExecAutonomousPeriodic();
-
-    /**
-     * Override currently selected autonomous mode.
-     *
-     * This is used for unit testing.
-     *
-     * @param name Name of autonomous mode.
-     */
-    void SelectMethod(std::string_view name);
 
 private:
     using steady_clock = std::chrono::steady_clock;
@@ -100,7 +119,7 @@ private:
     std::atomic<char> m_curAutonMode;
 
     std::thread m_recvThread;
-    std::mutex m_ipMutex;
+    wpi::mutex m_ipMutex;
     std::atomic<bool> m_recvRunning{false};
 
     /**

@@ -4,8 +4,9 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 #include <memory>
+
+#include <wpi/raw_ostream.h>
 
 using namespace frc3512;
 using namespace std::chrono_literals;
@@ -23,17 +24,16 @@ AutonSelector::AutonSelector(int port) : m_dsPort(port) {
     if (autonModeFile.is_open()) {
         char autonMode;
         if (autonModeFile >> autonMode) {
-            m_curAutonMode = autonMode;
-            std::cout << "AutonSelector: restored auton " << m_curAutonMode
-                      << std::endl;
+            wpi::outs() << "AutonSelector: restored auton " << autonMode
+                        << '\n';
 
             // Selection is stored as ASCII number in file
-            m_curAutonMode -= '0';
+            m_curAutonMode = autonMode - '0';
         } else {
-            std::cout << "AutonSelector: failed restoring auton" << std::endl;
+            wpi::outs() << "AutonSelector: failed restoring auton\n";
         }
     } else {
-        std::cout << "AutonSelector: failed opening autonMode.txt" << std::endl;
+        wpi::outs() << "AutonSelector: failed opening autonMode.txt\n";
         m_curAutonMode = 0;
     }
 
@@ -41,7 +41,7 @@ AutonSelector::AutonSelector(int port) : m_dsPort(port) {
     m_recvThread = std::thread([this] {
         while (m_recvRunning) {
             ReceiveFromDS();
-            std::this_thread::sleep_for(10ms);
+            std::this_thread::sleep_for(100ms);
         }
     });
 }
@@ -51,31 +51,51 @@ AutonSelector::~AutonSelector() {
     m_recvThread.join();
 }
 
-void AutonSelector::AddMethod(std::string_view methodName,
-                              std::function<void()> initFunc,
-                              std::function<void()> periodicFunc) {
-    m_autonModes.emplace_back(methodName, initFunc, periodicFunc);
+void AutonSelector::AddMode(std::string_view modeName,
+                            std::function<void()> initFunc,
+                            std::function<void()> periodicFunc) {
+    m_autonModes.emplace_back(modeName, initFunc, periodicFunc);
 }
 
-void AutonSelector::DeleteAllMethods() { m_autonModes.clear(); }
+void AutonSelector::SetMode(std::string_view modeName) {
+    auto it =
+        std::find_if(m_autonModes.begin(), m_autonModes.end(),
+                     [&](const auto& i) { return std::get<0>(i) == modeName; });
+    if (it != m_autonModes.cend()) {
+        SetMode(std::distance(m_autonModes.begin(), it));
+    }
+}
+
+void AutonSelector::SetMode(int mode) {
+    m_curAutonMode = mode;
+
+    char autonNum = '0' + m_curAutonMode;
+    std::ofstream autonMode{"autonMode.txt"};
+    autonMode << autonNum;
+}
+
+std::string_view AutonSelector::GetName(int mode) const {
+    return std::get<0>(m_autonModes[mode]);
+}
+
+int AutonSelector::Size() const { return m_autonModes.size(); }
 
 void AutonSelector::ExecAutonomousInit() {
+    if (m_autonModes.size() == 0) {
+        return;
+    }
+
     // Retrieves correct autonomous routine and runs it
     std::get<1>(m_autonModes[m_curAutonMode])();
 }
 
 void AutonSelector::ExecAutonomousPeriodic() {
+    if (m_autonModes.size() == 0) {
+        return;
+    }
+
     // Retrieves correct autonomous routine and runs it
     std::get<2>(m_autonModes[m_curAutonMode])();
-}
-
-void AutonSelector::SelectMethod(std::string_view name) {
-    auto it =
-        std::find_if(m_autonModes.begin(), m_autonModes.end(),
-                     [&](const auto& i) { return std::get<0>(i) == name; });
-    if (it != m_autonModes.cend()) {
-        m_curAutonMode = std::distance(m_autonModes.begin(), it);
-    }
 }
 
 void AutonSelector::SendToDS(Packet& packet) {
@@ -150,17 +170,16 @@ void AutonSelector::ReceiveFromDS() {
                 char autonNum = '0' + m_curAutonMode;
 
                 if (autonModeFile << autonNum) {
-                    std::cout << "AutonSelector: autonSelect: wrote auton "
-                              << autonNum << " to file" << std::endl;
+                    wpi::outs() << "AutonSelector: autonSelect: wrote auton "
+                                << autonNum << " to file\n";
                 } else {
-                    std::cout
+                    wpi::outs()
                         << "AutonSelector: autonSelect: failed writing auton "
-                        << autonNum << " into open file" << std::endl;
+                        << autonNum << " into open file\n";
                 }
             } else {
-                std::cout << "AutonSelector: autonSelect: failed to open "
-                             "autonMode.txt"
-                          << std::endl;
+                wpi::outs() << "AutonSelector: autonSelect: failed to open "
+                               "autonMode.txt\n";
             }
 
             SendToDS(packet);

@@ -17,5 +17,6 @@ modifiableFileExclude {
 }
 
 includeOtherLibs {
+  ^wpi/
   ^jpeglib\.h$
 }

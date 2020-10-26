@@ -9,7 +9,7 @@ CXXFLAGS := -O0 -g3 -Wall -std=c++17
 LD := g++
 
 # Specify Linux include paths with -I directives here
-IFLAGS := -Ihost/include
+IFLAGS := -Ihost/include -Isrc
 
 # Specify Linux libs with -l directives here
 LDFLAGS := -pthread
